@@ -6,6 +6,7 @@ import { Sidebar } from './components/Sidebar/Sidebar';
 import { Home } from './pages/Home/Home';
 import { Collections } from './pages/Collections/Collections';
 import { Profile } from './pages/Profile/Profile';
+import { Address } from './pages/Address/Address';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -22,6 +23,8 @@ function App() {
         return <Collections />;
       case 'profile':
         return <Profile />;
+      case 'address':
+        return <Address />;
       default:
         return <Home />;
     }

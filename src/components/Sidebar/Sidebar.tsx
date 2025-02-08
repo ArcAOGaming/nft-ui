@@ -30,6 +30,12 @@ export const Sidebar = ({ isOpen, onClose, activePage, onNavigate }: SidebarProp
                     >
                         Profile
                     </button>
+                    <button
+                        className={`tab ${activePage === 'address' ? 'active' : ''}`}
+                        onClick={() => onNavigate('address')}
+                    >
+                        Address
+                    </button>
                 </div>
             </div>
         </div>

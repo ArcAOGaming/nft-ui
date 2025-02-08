@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { TextInput, Button } from '@randaotoken/component-library';
 import { ProfileClient, ProfileInfo } from 'ao-process-clients';
 import { bulkTransferAssets } from '../../utils/bulkTransfer';
-import './Profile.css';
+import './Address.css';
 
 interface Asset {
     id: string;
@@ -10,9 +10,9 @@ interface Asset {
     quantity: number;
 }
 
-export function Profile() {
+export function Address() {
     const [client, setClient] = useState<ProfileClient | null>(null);
-    const [profileData, setProfileData] = useState<{
+    const [addressData, setAddressData] = useState<{
         info: ProfileInfo | null;
         assets: Asset[];
         error?: string;
@@ -27,8 +27,8 @@ export function Profile() {
     const [transferStatus, setTransferStatus] = useState('');
     const [isTransferring, setIsTransferring] = useState(false);
 
-    const handleLoadProfile = async () => {
-        setProfileData(prev => ({ ...prev, isLoading: true, error: undefined }));
+    const handleLoadAddress = async () => {
+        setAddressData(prev => ({ ...prev, isLoading: true, error: undefined }));
 
         try {
             const profileClient = await ProfileClient.createAutoConfigured();
@@ -44,16 +44,16 @@ export function Profile() {
                 };
             }) || [];
 
-            setProfileData({
+            setAddressData({
                 info,
                 assets: assetList,
                 isLoading: false
             });
         } catch (err) {
-            console.error('Error loading profile:', err);
-            setProfileData(prev => ({
+            console.error('Error loading address:', err);
+            setAddressData(prev => ({
                 ...prev,
-                error: 'Failed to load profile information',
+                error: 'Failed to load address information',
                 isLoading: false
             }));
         }
@@ -99,36 +99,36 @@ export function Profile() {
     };
 
     return (
-        <div className="profile-container">
+        <div className="address-container">
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <div>
-                    <h1 style={{ marginBottom: '0.25rem' }}>Profile</h1>
+                    <h1 style={{ marginBottom: '0.25rem' }}>Address</h1>
                     {client && (
                         <div style={{ fontSize: '0.9em', color: '#666' }}>
-                            <div>Name: {profileData.info?.Profile.DisplayName || 'Not set'}</div>
+                            <div>Name: {addressData.info?.Profile.DisplayName || 'Not set'}</div>
                             <div>ID: {client.getProcessId()}</div>
                         </div>
                     )}
                 </div>
                 <Button
-                    onClick={handleLoadProfile}
-                    disabled={profileData.isLoading}
+                    onClick={handleLoadAddress}
+                    disabled={addressData.isLoading}
                 >
-                    {profileData.isLoading ? 'Loading...' : 'Refresh'}
+                    {addressData.isLoading ? 'Loading...' : 'Refresh'}
                 </Button>
             </div>
 
-            {profileData.error && (
+            {addressData.error && (
                 <div className="error-message">
-                    {profileData.error}
+                    {addressData.error}
                 </div>
             )}
 
-            {profileData.assets.length > 0 && (
+            {addressData.assets.length > 0 && (
                 <>
                     <div style={{ marginTop: '2rem', marginBottom: '1rem' }}>
                         <div style={{ marginBottom: '1rem', color: '#666' }}>
-                            Total Assets: {profileData.assets.length} | Selected: {selectedAssets.length}
+                            Total Assets: {addressData.assets.length} | Selected: {selectedAssets.length}
                         </div>
                         <TextInput
                             label="Recipient Address"
@@ -148,14 +148,14 @@ export function Profile() {
                                         ref={checkbox => {
                                             if (checkbox) {
                                                 checkbox.indeterminate = selectedAssets.length > 0 &&
-                                                    selectedAssets.length < profileData.assets.length;
+                                                    selectedAssets.length < addressData.assets.length;
                                             }
                                         }}
-                                        checked={profileData.assets.length > 0 &&
-                                            selectedAssets.length === profileData.assets.length}
+                                        checked={addressData.assets.length > 0 &&
+                                            selectedAssets.length === addressData.assets.length}
                                         onChange={(e) => {
                                             if (e.target.checked) {
-                                                setSelectedAssets(profileData.assets.map(asset => asset.id));
+                                                setSelectedAssets(addressData.assets.map(asset => asset.id));
                                             } else {
                                                 setSelectedAssets([]);
                                             }
@@ -168,7 +168,7 @@ export function Profile() {
                             </tr>
                         </thead>
                         <tbody>
-                            {profileData.assets.map(asset => (
+                            {addressData.assets.map(asset => (
                                 <tr key={asset.id}>
                                     <td className="checkbox-cell">
                                         <input
@@ -192,7 +192,7 @@ export function Profile() {
                     </table>
 
                     {transferStatus && (
-                        <div className={`status-message ${profileData.error ? 'error' : 'success'}`}>
+                        <div className={`status-message ${addressData.error ? 'error' : 'success'}`}>
                             {transferStatus}
                         </div>
                     )}
@@ -208,11 +208,11 @@ export function Profile() {
                 </>
             )}
 
-            {profileData.info && (
-                <div className="profile-info">
-                    <h2>Profile Information</h2>
+            {addressData.info && (
+                <div className="address-info">
+                    <h2>Address Information</h2>
                     <pre>
-                        {JSON.stringify(profileData.info, null, 2)}
+                        {JSON.stringify(addressData.info, null, 2)}
                     </pre>
                 </div>
             )}

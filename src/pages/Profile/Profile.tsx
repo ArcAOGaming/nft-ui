@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { TextInput, Button } from '@randaotoken/component-library';
 import { ProfileClient, ProfileInfo } from 'ao-process-clients';
-import { bulkTransferAssets } from '../../utils/bulkTransfer';
+import { bulkTransferAssets } from '../../utils/bulkProfileTransfer';
 import './Profile.css';
 
 interface Asset {

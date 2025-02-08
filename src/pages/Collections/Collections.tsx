@@ -5,8 +5,8 @@ import {
     CollectionInfo,
     getCollectionClientAutoConfiguration,
 } from 'ao-process-clients';
-import { bulkTransferAssets } from '../../utils/bulkTransfer';
 import './Collections.css';
+import { bulkTransferAssets } from '../../utils/bulkProfileTransfer';
 
 export function Collections() {
     const [processId, setProcessId] = useState('');

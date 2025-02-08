@@ -7,12 +7,13 @@ import { Home } from './pages/Home/Home';
 import { Collections } from './pages/Collections/Collections';
 import { Profile } from './pages/Profile/Profile';
 import { Address } from './pages/Address/Address';
+import { Send } from './pages/Send';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState('home');
+  const [currentPage, setCurrentPage] = useState<'home' | 'collections' | 'profile' | 'address' | 'send'>('home');
 
-  const handleNavigate = (page: string) => {
+  const handleNavigate = (page: 'home' | 'collections' | 'profile' | 'address' | 'send') => {
     setCurrentPage(page);
     setIsSidebarOpen(false);
   };
@@ -25,6 +26,10 @@ function App() {
         return <Profile />;
       case 'address':
         return <Address />;
+      case 'send':
+        return <Send />;
+      case 'home':
+        return <Home />;
       default:
         return <Home />;
     }

@@ -7,7 +7,6 @@ interface BulkTransferResult {
 }
 
 export async function bulkNftTransfer(
-    processIds: string[],
     assetIds: string[],
     recipientId: string,
     onProgress?: (successCount: number) => void
@@ -16,25 +15,13 @@ export async function bulkNftTransfer(
     let failCount = 0;
     const failedAssets: string[] = [];
 
-    // Create NFT clients for each process ID
-    const nftClients = await Promise.all(
-        processIds.map(async (processId) => {
-            const client = new NftClient();
-            await client.load(processId);
-            return client;
-        })
-    );
+    const transferWithRetry = async (assetId: string, retries = 5): Promise<boolean> => {
+        // Create a new client using the asset ID as the process ID
+        const client = new NftClient(assetId);
 
-    const transferWithRetry = async (client: NftClient, assetId: string, retries = 5): Promise<boolean> => {
         for (let attempt = 0; attempt < retries; attempt++) {
             try {
-                const message = {
-                    Target: recipientId,
-                    Action: "Transfer",
-                    Quantity: "1",
-                    AssetId: assetId
-                };
-                await client.message(message);
+                await client.transfer(recipientId, "1");
                 return true;
             } catch (err) {
                 if (attempt === retries - 1) {
@@ -48,13 +35,10 @@ export async function bulkNftTransfer(
         return false;
     };
 
-    // Distribute assets across available NFT clients
-    const clientCount = nftClients.length;
+    // Process transfers in parallel
     const results = await Promise.all(
-        assetIds.map(async (assetId, index) => {
-            // Round-robin distribution of assets to clients
-            const client = nftClients[index % clientCount];
-            const success = await transferWithRetry(client, assetId);
+        assetIds.map(async assetId => {
+            const success = await transferWithRetry(assetId);
             if (success) {
                 successCount++;
                 onProgress?.(successCount);

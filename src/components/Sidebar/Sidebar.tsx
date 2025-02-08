@@ -1,10 +1,12 @@
 import './Sidebar.css';
 
+type PageType = 'home' | 'collections' | 'profile' | 'address' | 'send';
+
 interface SidebarProps {
     isOpen: boolean;
     onClose: () => void;
-    activePage: string;
-    onNavigate: (page: string) => void;
+    activePage: PageType;
+    onNavigate: (page: PageType) => void;
 }
 
 export const Sidebar = ({ isOpen, onClose, activePage, onNavigate }: SidebarProps) => {
@@ -35,6 +37,12 @@ export const Sidebar = ({ isOpen, onClose, activePage, onNavigate }: SidebarProp
                         onClick={() => onNavigate('address')}
                     >
                         Address
+                    </button>
+                    <button
+                        className={`tab ${activePage === 'send' ? 'active' : ''}`}
+                        onClick={() => onNavigate('send')}
+                    >
+                        Send
                     </button>
                 </div>
             </div>

@@ -21,6 +21,18 @@
     gap: 2rem;
 }
 
+.menu-button {
+    padding: 0.5rem !important;
+    min-width: unset !important;
+    font-size: 1.5rem !important;
+    line-height: 1 !important;
+    height: 40px !important;
+    width: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
 .logo {
     height: 40px;
     width: auto;

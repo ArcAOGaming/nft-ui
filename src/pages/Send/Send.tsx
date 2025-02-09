@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@randaotoken/component-library';
 import { bulkNftTransfer } from '../../utils/bulkNftTransfer';
 import { bulkTransferAssets } from '../../utils/bulkProfileTransfer';
+import { NftClient } from 'ao-process-clients';
 import './Send.css';
 
 export const Send = () => {
@@ -10,6 +11,44 @@ export const Send = () => {
     const [assetIds, setAssetIds] = useState('');
     const [status, setStatus] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [validationResults, setValidationResults] = useState<{
+        nftCount: number;
+        nonNftCount: number;
+        nonNftIds: string[];
+    }>({ nftCount: 0, nonNftCount: 0, nonNftIds: [] });
+
+    useEffect(() => {
+        const validateAssets = async () => {
+            if (!assetIds) return;
+
+            const assetIdList = assetIds.split(',').map(id => id.trim()).filter(Boolean);
+            if (assetIdList.length === 0) return;
+
+            let nftCount = 0;
+            let nonNftCount = 0;
+            const nonNftIds: string[] = [];
+
+            for (const assetId of assetIdList) {
+                try {
+                    const client = new NftClient(assetId);
+                    const info = await client.getInfo("1");
+                    if (info !== undefined && info !== null && Object.keys(info).length > 0) {
+                        nftCount++;
+                    } else {
+                        nonNftCount++;
+                        nonNftIds.push(assetId);
+                    }
+                } catch (error) {
+                    nonNftCount++;
+                    nonNftIds.push(assetId);
+                }
+            }
+
+            setValidationResults({ nftCount, nonNftCount, nonNftIds });
+        };
+
+        validateAssets();
+    }, [assetIds]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -84,9 +123,9 @@ export const Send = () => {
                                 width: '100%',
                                 minHeight: '100px',
                                 marginTop: '0.5rem',
-                                background: 'var(--color-grey-800)',
-                                color: 'var(--color-text)',
-                                border: '1px solid var(--color-grey-700)',
+                                background: 'var(--color-grey-100)',
+                                color: 'var(--color-grey-900)',
+                                border: '1px solid var(--color-grey-300)',
                                 borderRadius: '4px',
                                 padding: '0.75rem',
                                 fontSize: '1rem'
@@ -106,9 +145,9 @@ export const Send = () => {
                             style={{
                                 width: '100%',
                                 marginTop: '0.5rem',
-                                background: 'var(--color-grey-800)',
-                                color: 'var(--color-text)',
-                                border: '1px solid var(--color-grey-700)',
+                                background: 'var(--color-grey-100)',
+                                color: 'var(--color-grey-900)',
+                                border: '1px solid var(--color-grey-300)',
                                 borderRadius: '4px',
                                 padding: '0.75rem',
                                 fontSize: '1rem'
@@ -125,7 +164,7 @@ export const Send = () => {
                     {isLoading ? 'Processing...' : `Send Assets using ${useProfile ? 'Profile' : 'NFT'} Implementation`}
                 </Button>
 
-                {status && (
+                {(status || validationResults.nonNftCount > 0) && (
                     <div style={{
                         marginTop: '1.5rem',
                         padding: '1rem',
@@ -134,6 +173,21 @@ export const Send = () => {
                         fontSize: '0.9rem'
                     }}>
                         {status}
+                        {validationResults.nftCount > 0 && (
+                            <div style={{ marginTop: '0.5rem' }}>
+                                Valid NFTs: {validationResults.nftCount}
+                            </div>
+                        )}
+                        {validationResults.nonNftCount > 0 && (
+                            <>
+                                <div style={{ marginTop: '0.5rem', color: 'var(--color-grey-400)' }}>
+                                    Non-NFT Assets: {validationResults.nonNftCount}
+                                </div>
+                                <div style={{ marginTop: '0.5rem', fontSize: '0.8rem', color: 'var(--color-grey-400)' }}>
+                                    Non-NFT IDs: {validationResults.nonNftIds.join(', ')}
+                                </div>
+                            </>
+                        )}
                     </div>
                 )}
             </form>
